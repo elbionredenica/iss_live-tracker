@@ -3,7 +3,8 @@ import mapboxgl from 'mapbox-gl';
 
 import './App.css';
 
-mapboxgl.accessToken = 'pk.eyJ1Ijoibm90ZWxiaW9uIiwiYSI6ImNqdDF3b2ZsbzBmMjk0YnAzcWIwaW9jc2UifQ.VsQ_49cngtGm9kApyXFCkw'
+mapboxgl.accessToken = mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_TOKEN;
+// mapboxgl.accessToken = 'pk.eyJ1Ijoibm90ZWxiaW9uIiwiYSI6ImNqdDF3b2ZsbzBmMjk0YnAzcWIwaW9jc2UifQ.VsQ_49cngtGm9kApyXFCkw'
 
 function App() {
   const mapContainer = useRef(null);
