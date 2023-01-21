@@ -12,7 +12,6 @@ function App() {
   const [lat, setLat] = useState(37.773972);
   const [zoom, setZoom] = useState(9);
   const [location, setLocation] = useState({});
-
   
   useEffect(() => {
     if (map.current) return; // initialize map only once
@@ -35,26 +34,56 @@ function App() {
   
   useEffect(() => {
     const intervalId = setInterval(() => {
-      fetch('https://api.n2yo.com/rest/v1/satellite/positions/25544/41.702/-76.014/0/2/&?apiKey=34L9R7-JTXEVV-8BFG5B-4ZC0')
+      fetch('https://api.wheretheiss.at/v1/satellites/25544')
         .then(response => response.json())
         .then(data => {
-          const position = data.positions[0];
-          const longitude = position.satlongitude;
-          const latitude = position.satlatitude;
+          const longitude = data.longitude;
+          const latitude = data.latitude;
           setLocation({longitude, latitude});
         });
-    }, 6000);
+    }, 4000);
   
     return () => clearInterval(intervalId);
+    
   }, []);
 
-  useEffect(() => {
-    if (!map.current || !location.longitude) return;
-    const marker = new mapboxgl.Marker()
-      .setLngLat([location.longitude, location.latitude])
-      .addTo(map.current);
-  }, [location]);
+  let currentMarker = null;
+const pastMarkers = [];
 
+useEffect(() => {
+    if (!map.current || !location.longitude) return;
+    const el = document.createElement('div');
+    el.style.width = '30px';
+    el.style.height = '30px';
+    el.style.backgroundImage = "url('https://cdn-icons-png.flaticon.com/512/1042/1042820.png')";
+    el.style.backgroundSize = 'cover';
+
+    if (currentMarker) {
+        currentMarker.remove();
+    }
+
+    currentMarker = new mapboxgl.Marker(el)
+        .setLngLat([location.longitude, location.latitude])
+        .addTo(map.current);
+
+    pastMarkers.push(currentMarker);
+    if (pastMarkers.length > 1) {
+        pastMarkers.shift().remove();
+    }
+
+    const popup = new mapboxgl.Popup()
+        .setHTML('<div style="overflow-y: scroll; height: 300px"><h1> ISS Location Tracker </h1><img height="200" width="100%" src="https://www.nasa.gov/sites/default/files/s132e012209_sm.jpg"></img><h2>This marker is the current location of the International Space Station.</h2><h3>Data updates every 10 seconds. </h3><p> The International Space Station (ISS) is a habitable artificial satellite that orbits the Earth at an altitude of between 330 and 435 km. It is the largest human-made object in space and can often be seen from the Earth with the naked eye. The ISS is a collaboration between NASA (United States), Roscosmos (Russia), JAXA (Japan), ESA (Europe), and CSA (Canada). The ISS has been continuously occupied by humans since 2000, making it the longest continuously occupied human-made object in space. The space station serves as a research laboratory in low Earth orbit and enables long-duration human spaceflight. It has a pressurized volume of 916 cubic meters, which is equivalent to the interior space of a Boeing 747. The ISS is equipped with numerous scientific instruments, including the Alpha Magnetic Spectrometer, which is searching for evidence of dark matter and antimatter, and the COLBERT treadmill, which allows astronauts to exercise while in space. The ISS also serves as a platform for studying the effects of long-duration spaceflight on the human body, as well as the effects of microgravity on various materials and biological systems. The ISS is visited regularly by spacecraft from NASA and other international partners, including the Russian Soyuz and Progress spacecraft, the European Automated Transfer Vehicle, and the Japanese H-II Transfer Vehicle. The space station is also visited by commercial spacecraft, such as the SpaceX Dragon and the Boeing CST-100 Starliner. The ISS is expected to continue operating until at least 2030, although plans for its eventual decommissioning and replacement are currently under development.</p></div>')
+        .setMaxWidth("400px")
+    currentMarker.setPopup(popup)
+    currentMarker.getElement().addEventListener('click', () => {
+        currentMarker.togglePopup();
+    });
+
+}, [location]);
+
+
+
+// <div style="overflow-y: scroll; height: 300px"><h1> ISS Location Tracker </h1><img height="200" width="100%" src="https://www.nasa.gov/sites/default/files/s132e012209_sm.jpg"></img><h2>This marker is the current location of the International Space Station.</h2><h3>Data updates every 10 seconds. </h3><p> The International Space Station (ISS) is a habitable artificial satellite that orbits the Earth at an altitude of between 330 and 435 km. It is the largest human-made object in space and can often be seen from the Earth with the naked eye. The ISS is a collaboration between NASA (United States), Roscosmos (Russia), JAXA (Japan), ESA (Europe), and CSA (Canada). The ISS has been continuously occupied by humans since 2000, making it the longest continuously occupied human-made object in space. The space station serves as a research laboratory in low Earth orbit and enables long-duration human spaceflight. It has a pressurized volume of 916 cubic meters, which is equivalent to the interior space of a Boeing 747. The ISS is equipped with numerous scientific instruments, including the Alpha Magnetic Spectrometer, which is searching for evidence of dark matter and antimatter, and the COLBERT treadmill, which allows astronauts to exercise while in space. The ISS also serves as a platform for studying the effects of long-duration spaceflight on the human body, as well as the effects of microgravity on various materials and biological systems. The ISS is visited regularly by spacecraft from NASA and other international partners, including the Russian Soyuz and Progress spacecraft, the European Automated Transfer Vehicle, and the Japanese H-II Transfer Vehicle. The space station is also visited by commercial spacecraft, such as the SpaceX Dragon and the Boeing CST-100 Starliner. The ISS is expected to continue operating until at least 2030, although plans for its eventual decommissioning and replacement are currently under development.</p></div>
   useEffect(() => {
     if (!map.current || !location.longitude) return;
     map.current.setCenter([location.longitude, location.latitude]);
