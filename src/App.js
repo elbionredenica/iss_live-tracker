@@ -3,8 +3,7 @@ import mapboxgl from 'mapbox-gl';
 
 import './App.css';
 
-mapboxgl.accessToken = mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_TOKEN;
-// mapboxgl.accessToken = 'pk.eyJ1Ijoibm90ZWxiaW9uIiwiYSI6ImNqdDF3b2ZsbzBmMjk0YnAzcWIwaW9jc2UifQ.VsQ_49cngtGm9kApyXFCkw'
+mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_TOKEN;
 
 function App() {
   const mapContainer = useRef(null);
@@ -16,7 +15,7 @@ function App() {
   const [marker, setMarker] = useState(null);
   
   useEffect(() => {
-    if (map.current) return; // initialize map only once
+    if (map.current) return;
       map.current = new mapboxgl.Map({
       container: mapContainer.current,
       style: 'mapbox://styles/mapbox/streets-v12',
@@ -26,7 +25,7 @@ function App() {
   });
   
   useEffect(() => {
-    if (!map.current) return; // wait for map to initialize
+    if (!map.current) return; 
       map.current.on('move', () => {
       setLng(map.current.getCenter().lng.toFixed(4));
       setLat(map.current.getCenter().lat.toFixed(4));
@@ -52,7 +51,7 @@ function App() {
 
   useEffect(() => {
     if (!map.current || !location.longitude) return;
-    if (marker) marker.remove(); // remove previous marker if it exists
+    if (marker) marker.remove(); 
 
     const el = document.createElement('div');
     el.style.width = '30px';
@@ -70,7 +69,7 @@ function App() {
     newMarker.getElement().addEventListener('click', () => {
       newMarker.togglePopup();
     });
-    setMarker(newMarker); // update state variable to new marker
+    setMarker(newMarker); 
   }, [location, map]);
 
 
